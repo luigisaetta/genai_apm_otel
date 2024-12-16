@@ -13,11 +13,13 @@ from opentelemetry.sdk.trace.export import (
     SpanExportResult,
 )
 from opentelemetry.sdk.resources import Resource
+
 from config_reader import ConfigReader
 from config_private import APM_PUBLIC_KEY
 from utils import get_console_logger
 
 
+# this class is used to handle NO tracing
 class NoopSpanExporter(SpanExporter):
     """
     NoOp exporter for OpenTelemetry
@@ -30,12 +32,9 @@ class NoopSpanExporter(SpanExporter):
         pass
 
 
-logger = get_console_logger()
-
-
 class TracerSingleton:
     """
-    Singleton to handle tracing with OPenTelemetry to OCI APM
+    Singleton to handle tracing with OpenTelemetry to OCI APM
     """
 
     _instance = None
@@ -62,6 +61,8 @@ class TracerSingleton:
         service_name = config.find_key("service_name")
         tracer_name = config.find_key("tracer_name")
 
+        logger = get_console_logger()
+
         # Configura il tracer
         resource = Resource(attributes={"service.name": service_name})
         provider = TracerProvider(resource=resource)
@@ -84,3 +85,13 @@ class TracerSingleton:
 
         # Restituisce il tracer configurato
         return trace.get_tracer(tracer_name)
+
+
+    @staticmethod
+    def get_tracer_name():
+        """
+        get the name of the configured tracer
+        """
+        config = ConfigReader("./config.toml")
+
+        return config.find_key("tracer_name")

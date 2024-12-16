@@ -16,6 +16,7 @@ import oracledb
 from langchain_community.vectorstores.utils import DistanceStrategy
 
 from config_reader import ConfigReader
+from tracer_singleton import TracerSingleton
 from oraclevs_4_apm import OracleVS4APM
 
 from config_private import DB_USER, DB_PWD, DSN, TNS_ADMIN, WALLET_PWD
@@ -27,7 +28,11 @@ config = ConfigReader("./config.toml")
 VERBOSE = config.find_key("verbose")
 SERVICE_NAME = "Factory Vector Store"
 
+# for APM integration
+TRACER = TracerSingleton.get_instance()
 
+
+@TRACER.start_as_current_span("get_db_connection")
 def get_db_connection():
     """
     get a connection to db
@@ -57,9 +62,9 @@ def get_db_connection():
         raise
 
 
-def get_vector_store(vector_store_type, embed_model):
+@TRACER.start_as_current_span("get_vector_store")
+def get_vector_store(embed_model):
     """
-    vector_store_type: can be 23AI
     embed_model an object wrapping the model used for embeddings
     return a Vector Store Object
     """
@@ -68,23 +73,22 @@ def get_vector_store(vector_store_type, embed_model):
 
     v_store = None
 
-    if vector_store_type == "23AI":
-        try:
-            connection = get_db_connection()
+    try:
+        connection = get_db_connection()
 
-            v_store = OracleVS4APM(
-                client=connection,
-                table_name=config["vector_store"]["collection_name"],
-                distance_strategy=DistanceStrategy.COSINE,
-                embedding_function=embed_model,
-            )
-        except oracledb.Error as e:
-            err_msg = "A DB error occurred in get_vector_store: " + str(e)
-            logger.error(err_msg)
-        except Exception as e:
-            # Catch all other exceptions
-            err_msg = "An unexpected error occurred in get_vector_store: " + str(e)
-            logger.error(err_msg)
-            logger.error(e)
+        v_store = OracleVS4APM(
+            client=connection,
+            table_name=config.find_key("collection_name"),
+            distance_strategy=DistanceStrategy.COSINE,
+            embedding_function=embed_model,
+        )
+    except oracledb.Error as e:
+        err_msg = "A DB error occurred in get_vector_store: " + str(e)
+        logger.error(err_msg)
+    except Exception as e:
+        # Catch all other exceptions
+        err_msg = "An unexpected error occurred in get_vector_store: " + str(e)
+        logger.error(err_msg)
+        logger.error(e)
 
     return v_store

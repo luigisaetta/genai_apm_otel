@@ -7,8 +7,9 @@ from typing import Dict, List, Any
 from langchain_core.documents.base import Document
 from langchain_community.vectorstores.oraclevs import OracleVS
 
+from tracer_singleton import TracerSingleton
 
-SERVICE_NAME = "OracleVS"
+TRACER = TracerSingleton.get_instance()
 
 
 class OracleVS4APM(OracleVS):
@@ -16,6 +17,7 @@ class OracleVS4APM(OracleVS):
     Subclass with extension to add tracing for APM
     """
 
+    @TRACER.start_as_current_span("similarity_search")
     def similarity_search(
         self, query: str, k: int = 4, filter: Dict[str, Any] | None = None, **kwargs
     ) -> List[Document]:

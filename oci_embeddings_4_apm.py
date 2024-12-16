@@ -11,22 +11,24 @@ License: MIT
 
 from langchain_community.embeddings import OCIGenAIEmbeddings
 
-# convention: the name of the superclass
-SERVICE_NAME = "OCIGenAIEmbeddings"
+from tracer_singleton import TracerSingleton
+
+TRACER = TracerSingleton.get_instance()
 
 
 #
-# extend OCIGenAIEmbeddings adding batching
+# extend OCIGenAIEmbeddings to integrate with APM
 #
-class OCIGenAIEmbeddingsWithBatch(OCIGenAIEmbeddings):
+class OCIGenAIEmbeddings4APM(OCIGenAIEmbeddings):
     """
     Subclass to enable addition of annotation
     """
 
     # instrumented for integration with APM
+    @TRACER.start_as_current_span("embed_documents")
     def embed_documents(self, texts):
         """
-        in addition to  integration with APM it also add batching
+        call the superclass method
         """
         embeddings = super().embed_documents(texts)
 
