@@ -1,0 +1,53 @@
+#
+# Configuration file
+#
+
+[general]
+# setting this flag we get more information in the logs
+verbose = false
+# port per l'api REST
+api_port = 8888
+# max_msg in conversation
+conv_max_msgs = 10
+
+[apm_tracing]
+# globally enable/disable tracing
+enable_tracing = true
+base_url = "https://aaaadec2jjn3maaaaaaaaach4e.apm-agt.eu-frankfurt-1.oci.oraclecloud.com/20200101"
+apm_content_type = "application/json"
+
+# logs to APM input/output in addition to timings
+detailed_tracing = true
+# we should set this one wisely
+sample_rate = 100
+
+
+[embeddings]
+
+[embeddings.oci]
+embed_endpoint = "https://inference.generativeai.eu-frankfurt-1.oci.oraclecloud.com"
+embed_model = "cohere.embed-multilingual-v3.0"
+
+[vector_store]
+collection_name = "ALL_BOOKS"
+
+[retriever]
+# # of docs retrieved by semantic search
+top_k = 6
+
+# general llm
+[llm]
+max_tokens = 1024
+model_type = "OCI"
+temperature = 0.1
+top_k = 1
+top_p = 1
+
+[llm.oci]
+# FRA
+endpoint = "https://inference.generativeai.eu-frankfurt-1.oci.oraclecloud.com"
+
+# updated
+llm_model = "cohere.command-r-08-2024"
+# llm_model = "cohere.command-r-plus-08-2024"
+# llm_model = "meta.llama-3.1-70b-instruct"
