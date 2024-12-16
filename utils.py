@@ -5,7 +5,6 @@ Utils
 import re
 import logging
 from typing import List
-import toml
 from langchain_core.documents.base import Document
 
 CONFIG_FILE = "config.toml"
@@ -46,26 +45,6 @@ def get_console_logger():
     logger.propagate = False
 
     return logger
-
-
-def load_configuration(config_file: str = CONFIG_FILE) -> dict:
-    """
-    Read the configuration from a TOML file.
-
-    Args:
-        config_file (str): Path to the TOML configuration file. Defaults to CONFIG_FILE.
-
-    Returns:
-        dict: The loaded configuration as a dictionary.
-    """
-    try:
-        with open(config_file, "r", encoding="utf-8") as file:
-            config = toml.load(file)
-    except (FileNotFoundError, toml.TomlDecodeError) as e:
-        logging.error("Error loading configuration: %s", e)
-        raise
-
-    return config
 
 
 def sanitize_parameter(param: str) -> str:

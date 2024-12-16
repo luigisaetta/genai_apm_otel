@@ -15,16 +15,16 @@ import oracledb
 
 from langchain_community.vectorstores.utils import DistanceStrategy
 
+from config_reader import ConfigReader
 from oraclevs_4_apm import OracleVS4APM
-from utils import load_configuration
 
 from config_private import DB_USER, DB_PWD, DSN, TNS_ADMIN, WALLET_PWD
 
 #
 # Configs
 #
-config = load_configuration()
-VERBOSE = config["general"]["verbose"]
+config = ConfigReader("./config.toml")
+VERBOSE = config.find_key("verbose")
 SERVICE_NAME = "Factory Vector Store"
 
 

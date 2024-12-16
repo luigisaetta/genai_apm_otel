@@ -9,14 +9,16 @@ from langchain_core.messages import BaseMessage
 from langchain_core.language_models import LanguageModelInput
 from langchain_community.chat_models import ChatOCIGenAI
 
-from utils import load_configuration, get_console_logger
+from config_reader import ConfigReader
+from utils import get_console_logger
 
 
 SERVICE_NAME = "ChatOCIGenaAI"
 
 logger = get_console_logger()
 
-app_config = load_configuration()
+app_config = ConfigReader("./config.toml")
+VERBOSE = app_config.find_key("verbose")
 
 
 class ChatOCIGenAI4APM(ChatOCIGenAI):
@@ -46,7 +48,7 @@ class ChatOCIGenAI4APM(ChatOCIGenAI):
         """
         output = super().invoke(input, config=config, stop=stop, **kwargs)
 
-        if app_config["general"]["verbose"]:
+        if VERBOSE:
             # Log input and output messages for debugging purposes
             for msg in input.messages:
                 logger.info("Input: %s", msg.content)

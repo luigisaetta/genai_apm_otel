@@ -13,14 +13,15 @@ from oci_embeddings_4_apm import OCIGenAIEmbeddingsWithBatch
 from chatocigenai_4_apm import ChatOCIGenAI4APM
 from factory_vector_store import get_vector_store
 from prompts_library import CONTEXT_Q_PROMPT, QA_PROMPT
-from utils import load_configuration, get_console_logger
+from config_reader import ConfigReader
+from utils import get_console_logger
 
 from config_private import COMPARTMENT_ID
 
-config = load_configuration()
-
 SERVICE_NAME = "Factory"
-VERBOSE = config["general"]["verbose"]
+
+config = ConfigReader("./config.toml")
+VERBOSE = config.find_key("verbose")
 
 logger = get_console_logger()
 
@@ -32,8 +33,8 @@ def get_embed_model():
 
     embed_model = OCIGenAIEmbeddingsWithBatch(
         auth_type="API_KEY",
-        model_id=config["embeddings"]["oci"]["embed_model"],
-        service_endpoint=config["embeddings"]["oci"]["embed_endpoint"],
+        model_id=config.find_key("embed_model"),
+        service_endpoint=config.find_key("embed_endpoint"),
         compartment_id=COMPARTMENT_ID,
     )
 
@@ -45,9 +46,9 @@ def get_llm():
     Build and return the LLM client
     """
 
-    model_id = config["llm"]["oci"]["llm_model"]
-    max_tokens = config["llm"]["max_tokens"]
-    temperature = config["llm"]["temperature"]
+    model_id = config.find_key("llm_model")
+    max_tokens = config.find_key("max_tokens")
+    temperature = config.find_key("temperature")
 
     if VERBOSE:
         logger.info("%s as ChatModel...", model_id)
@@ -56,7 +57,7 @@ def get_llm():
         # this example uses api_key
         auth_type="API_KEY",
         model_id=model_id,
-        service_endpoint=config["llm"]["oci"]["endpoint"],
+        service_endpoint=config.find_key("endpoint"),
         compartment_id=COMPARTMENT_ID,
         is_stream=True,
         model_kwargs={"temperature": temperature, "max_tokens": max_tokens},
@@ -74,7 +75,7 @@ def build_rag_chain():
     v_store = get_vector_store(vector_store_type="23AI", embed_model=embed_model)
 
     # num of docs returned from semantic search
-    top_k = config["retriever"]["top_k"]
+    top_k = config.find_key("top_k")
 
     retriever = v_store.as_retriever(search_kwargs={"k": top_k})
 

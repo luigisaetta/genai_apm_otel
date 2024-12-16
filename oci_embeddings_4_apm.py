@@ -3,7 +3,7 @@ Author: Luigi Saetta
 Date created: 2024-04-27
 Date last modified: 2024-06-27
 
-This version has been instrumented with zipkin for APM integration
+This version has been instrumented with Open Telemery for APM integration
 Python Version: 3.11
 
 License: MIT
@@ -20,9 +20,7 @@ SERVICE_NAME = "OCIGenAIEmbeddings"
 #
 class OCIGenAIEmbeddingsWithBatch(OCIGenAIEmbeddings):
     """
-    in addition to  integration with APM
-    add batching to OCIEmebeddings
-    with Cohere max # of texts is: 96
+    Subclass to enable addition of annotation
     """
 
     # instrumented for integration with APM

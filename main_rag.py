@@ -15,7 +15,8 @@ from pydantic import BaseModel
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from factory import build_rag_chain
 
-from utils import load_configuration, get_console_logger, sanitize_parameter
+from config_reader import ConfigReader
+from utils import get_console_logger, sanitize_parameter
 
 # constants
 MEDIA_TYPE_TEXT = "text/plain"
@@ -30,9 +31,9 @@ app = FastAPI()
 # key is conv_id
 conversations: Dict[str, List[BaseMessage]] = {}
 
-config = load_configuration()
+config = ConfigReader("./config.toml")
+VERBOSE = config.find_key("verbose")
 SERVICE_NAME = "DemoGenAIAPM"
-VERBOSE = config["general"]["verbose"]
 
 logger = get_console_logger()
 
@@ -79,7 +80,7 @@ def add_message(conv_id, msg):
     conversation.append(msg)
 
     # to keep only MAX_NUM_MSGS in the conversation
-    if len(conversation) > config["general"]["conv_max_msgs"]:
+    if len(conversation) > config.find_key("conv_max_msgs"):
         if VERBOSE:
             logger.info("Removing old msg from conversation id: %s", conv_id)
         # remove first (older) el from conversation
@@ -229,7 +230,7 @@ def delete(conv_id: str):
 
 
 if __name__ == "__main__":
-    if config["apm_tracing"]["enable_tracing"]:
+    if config.find_key("enable_tracing"):
         logger.info("APM tracing is enabled!")
 
-    uvicorn.run(host="0.0.0.0", port=config["general"]["api_port"], app=app)
+    uvicorn.run(host="0.0.0.0", port=config.find_key("api_port"), app=app)
