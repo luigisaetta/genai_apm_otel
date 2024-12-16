@@ -23,7 +23,7 @@ class ChatOCIGenAI4APM(ChatOCIGenAI):
     Extension for integration with Application Performance Monitoring (APM).
     """
 
-    @TRACER.start_as_current_span("invoke")
+    @TRACER.start_as_current_span("ChatOCIGenAI.invoke")
     def invoke(
         self,
         input: LanguageModelInput,

@@ -32,7 +32,6 @@ app = FastAPI()
 
 config = ConfigReader("./config.toml")
 VERBOSE = config.find_key("verbose")
-SERVICE_NAME = "GenAIAPM_OTel"
 # max msgs in conversation
 CONV_MAX_MSGS = config.find_key("conv_max_msgs")
 
@@ -40,6 +39,7 @@ logger = get_console_logger()
 
 # Global object to handle conversation history
 conversation_manager = ConversationManager(CONV_MAX_MSGS)
+
 # to integrate with OCI APM
 TRACER = TracerSingleton.get_instance()
 
@@ -69,11 +69,8 @@ def handle_request(request: InvokeInput, conv_id: str):
     # build_rag_chain mark a span (see: factory)
     chain = build_rag_chain()
 
-    # to give more fine grained info, mark another span
-
     # get the chat history
     conversation = conversation_manager.get_conversation(conv_id)
-
     #
     # call the RAG chain
     #
@@ -90,7 +87,7 @@ def handle_request(request: InvokeInput, conv_id: str):
 # HTTP API methods
 #
 @app.post("/invoke/", tags=["V1"])
-@TRACER.start_as_current_span("rag_invoke")
+@TRACER.start_as_current_span("api.invoke")
 def invoke(request: InvokeInput, conv_id: str):
     """
     This function handle the HTTP request
@@ -174,8 +171,6 @@ def delete(conv_id: str):
 
 
 if __name__ == "__main__":
-    if config.find_key("trace_enable"):
-        logger.info("APM tracing is enabled!")
 
     API_HOST = config.find_key("api_host")
     API_PORT = config.find_key("api_port")

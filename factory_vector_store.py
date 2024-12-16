@@ -18,6 +18,7 @@ from langchain_community.vectorstores.utils import DistanceStrategy
 from config_reader import ConfigReader
 from tracer_singleton import TracerSingleton
 from oraclevs_4_apm import OracleVS4APM
+from utils import get_console_logger
 
 from config_private import DB_USER, DB_PWD, DSN, TNS_ADMIN, WALLET_PWD
 
@@ -36,20 +37,20 @@ TRACER = TracerSingleton.get_instance()
 def get_db_connection():
     """
     get a connection to db
+
+    this function works if the DB is ADB
     """
-    logger = logging.getLogger("ConsoleLogger")
+    logger = get_console_logger()
 
-    # common params
-    conn_parms = {"user": DB_USER, "password": DB_PWD, "dsn": DSN, "retry_count": 3}
-
-    # connection to ADB, needs wallet
-    conn_parms.update(
-        {
-            "config_dir": TNS_ADMIN,
-            "wallet_location": TNS_ADMIN,
-            "wallet_password": WALLET_PWD,
-        }
-    )
+    conn_parms = {
+        "user": DB_USER,
+        "password": DB_PWD,
+        "dsn": DSN,
+        "retry_count": 3,
+        "config_dir": TNS_ADMIN,
+        "wallet_location": TNS_ADMIN,
+        "wallet_password": WALLET_PWD,
+    }
 
     if VERBOSE:
         logger.info("")
@@ -74,10 +75,10 @@ def get_vector_store(embed_model):
     v_store = None
 
     try:
-        connection = get_db_connection()
+        db_conn = get_db_connection()
 
         v_store = OracleVS4APM(
-            client=connection,
+            client=db_conn,
             table_name=config.find_key("collection_name"),
             distance_strategy=DistanceStrategy.COSINE,
             embedding_function=embed_model,

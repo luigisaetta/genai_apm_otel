@@ -19,7 +19,6 @@ from utils import get_console_logger
 
 from config_private import COMPARTMENT_ID
 
-SERVICE_NAME = "Factory"
 
 config = ConfigReader("./config.toml")
 VERBOSE = config.find_key("verbose")

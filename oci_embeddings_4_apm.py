@@ -10,7 +10,6 @@ License: MIT
 """
 
 from langchain_community.embeddings import OCIGenAIEmbeddings
-
 from tracer_singleton import TracerSingleton
 
 TRACER = TracerSingleton.get_instance()
@@ -25,7 +24,7 @@ class OCIGenAIEmbeddings4APM(OCIGenAIEmbeddings):
     """
 
     # instrumented for integration with APM
-    @TRACER.start_as_current_span("embed_documents")
+    @TRACER.start_as_current_span("OCIGenAIEmbeddings.embed_documents")
     def embed_documents(self, texts):
         """
         call the superclass method

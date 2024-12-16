@@ -32,6 +32,9 @@ class NoopSpanExporter(SpanExporter):
         pass
 
 
+config_tracing = ConfigReader("./config_tracing.toml")
+
+
 class TracerSingleton:
     """
     Singleton to handle tracing with OpenTelemetry to OCI APM
@@ -52,14 +55,13 @@ class TracerSingleton:
     @staticmethod
     def _init_tracer():
         """
-        Init tracer for APM integration, leggendo i parametri dalla configurazione.
+        Init tracer for APM integration
         """
-        # Legge la configurazione dal file (puoi personalizzare il percorso)
-        config = ConfigReader("./config.toml")
-        trace_enable = config.find_key("trace_enable")
-        apm_endpoint = config.find_key("apm_endpoint")
-        service_name = config.find_key("service_name")
-        tracer_name = config.find_key("tracer_name")
+
+        trace_enable = config_tracing.find_key("trace_enable")
+        apm_endpoint = config_tracing.find_key("apm_endpoint")
+        service_name = config_tracing.find_key("service_name")
+        tracer_name = config_tracing.find_key("tracer_name")
 
         logger = get_console_logger()
 
@@ -68,7 +70,7 @@ class TracerSingleton:
         provider = TracerProvider(resource=resource)
 
         if trace_enable:
-            # Configura l'exporter OTLP se tracing è abilitato
+            # Configure OTLP if tracing is enabled
             logger.info("Enabling APM tracing...")
 
             exporter = OTLPSpanExporter(
@@ -86,12 +88,9 @@ class TracerSingleton:
         # Restituisce il tracer configurato
         return trace.get_tracer(tracer_name)
 
-
     @staticmethod
     def get_tracer_name():
         """
         get the name of the configured tracer
         """
-        config = ConfigReader("./config.toml")
-
-        return config.find_key("tracer_name")
+        return config_tracing.find_key("tracer_name")
