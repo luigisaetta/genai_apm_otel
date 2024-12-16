@@ -53,6 +53,7 @@ def get_llm():
     model_id = config.find_key("llm_model")
     max_tokens = config.find_key("max_tokens")
     temperature = config.find_key("temperature")
+    service_endpoint = config.find_key("endpoint")
 
     if VERBOSE:
         logger.info("%s as ChatModel...", model_id)
@@ -61,7 +62,7 @@ def get_llm():
         # this example uses api_key
         auth_type=AUTH_TYPE,
         model_id=model_id,
-        service_endpoint=config.find_key("endpoint"),
+        service_endpoint=service_endpoint,
         compartment_id=COMPARTMENT_ID,
         is_stream=True,
         model_kwargs={"temperature": temperature, "max_tokens": max_tokens},

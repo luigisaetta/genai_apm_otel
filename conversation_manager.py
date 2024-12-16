@@ -11,7 +11,7 @@ class ConversationManager:
     To handle the conversation history
     """
 
-    def __init__(self, max_messages: int = 100):
+    def __init__(self, max_messages: int = 20):
         # Dictionary to store conversation history, where key is conv_id
         self._conversations: Dict[str, List[BaseMessage]] = {}
         self._max_messages = max_messages

@@ -6,7 +6,7 @@ import streamlit as st
 import requests
 from langchain_core.messages import HumanMessage, AIMessage
 
-# Configura la tua API endpoint
+# Configure API endpoint
 INVOKE_URL = "http://localhost:8888/invoke/"
 DELETE_URL = "http://localhost:8888/delete/"
 
@@ -87,7 +87,6 @@ if question := st.chat_input("Hello, how can I help you?"):
     ai_response = invoke_api(conv_id, question)
 
     with st.chat_message(ASSISTANT):
-        # show output
         st.markdown(ai_response)
 
         # Add assistant response to chat history

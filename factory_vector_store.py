@@ -10,7 +10,6 @@ Usage:
 Python Version: 3.11
 """
 
-import logging
 import oracledb
 
 from langchain_community.vectorstores.utils import DistanceStrategy
@@ -32,6 +31,8 @@ SERVICE_NAME = "Factory Vector Store"
 # for APM integration
 TRACER = TracerSingleton.get_instance()
 
+logger = get_console_logger()
+
 
 @TRACER.start_as_current_span("get_db_connection")
 def get_db_connection():
@@ -40,7 +41,6 @@ def get_db_connection():
 
     this function works if the DB is ADB
     """
-    logger = get_console_logger()
 
     conn_parms = {
         "user": DB_USER,
@@ -69,8 +69,6 @@ def get_vector_store(embed_model):
     embed_model an object wrapping the model used for embeddings
     return a Vector Store Object
     """
-
-    logger = logging.getLogger("ConsoleLogger")
 
     v_store = None
 

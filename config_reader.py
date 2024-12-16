@@ -20,8 +20,6 @@ License:
     This code is released under the MIT License.
 
 Notes:
-    This is a part of a set of demos showing how to build a SQL Agent
-    for Text2SQL taks
 
 Warnings:
     This module is in development, may change in future versions.

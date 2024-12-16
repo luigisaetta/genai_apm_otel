@@ -7,7 +7,7 @@ to test APM integration
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response, StreamingResponse
+from fastapi.responses import Response
 from pydantic import BaseModel
 
 # APM integration
@@ -120,39 +120,6 @@ def invoke(request: InvokeInput, conv_id: str):
         answer = f"Error: {str(e)}"
 
     return Response(content=answer, media_type=MEDIA_TYPE_TEXT)
-
-
-def chat_stream_generator(response):
-    """
-    helper function to support streaming
-    """
-    for chunk in response:
-        if "answer" in chunk:
-            yield chunk["answer"]
-
-
-@app.post("/stream/", tags=["V1"])
-def stream(request: InvokeInput, conv_id: str):
-    """
-    This function handle the HTTP request
-
-    conv_id: the id of the conversation, to handle chat_history
-    """
-
-    # remove eventually any dangerous char
-    conv_id = sanitize_parameter(conv_id)
-
-    logger.info("Conversation id: %s", conv_id)
-
-    chain = build_rag_chain()
-
-    conversation = conversation_manager.get_conversation(conv_id)
-
-    response = chain.stream({"input": request.query, "chat_history": conversation})
-
-    return StreamingResponse(
-        chat_stream_generator(response), media_type=MEDIA_TYPE_TEXT
-    )
 
 
 # to clean up a conversation
